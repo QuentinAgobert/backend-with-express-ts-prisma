@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String @unique
+  password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  // One-to-One relation
+  profile        Profile?
+  // Many-to-Many relation
+  meetings       Meeting[]
+  // One-to-Many relation
+  managerId      Int?
+  manager        User?     @relation("Manage", fields: [managerId], references: [id])
+  estLeManagerDe User[]    @relation("Manage")
+}
+
+model Profile {
+  id          Int       @id @default(autoincrement())
+  description String
+  birthDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  // One-to-One relation
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Meeting {
+  id       Int      @id @default(autoincrement())
+  title    String
+  duration Float
+  date     DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  // Many-to-Many
+  participants User[]
+}
